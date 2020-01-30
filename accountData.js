@@ -5,6 +5,6 @@ module.exports = [{
     login: 'FakeName123123',
     password: 'FakePassword'
 }, {
-    login: 'FakeName124132',
+    login: 'FakeName8568679', 
     password: 'FakePassword'
 }];
