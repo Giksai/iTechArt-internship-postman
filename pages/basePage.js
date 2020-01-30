@@ -82,11 +82,11 @@ class BasePage {
     getAllErrors(prevValue = null) {
         logger.debug(`getAllErrors: trying to get all errors from current page.`);
         if (prevValue)
-            this.waitForElementToUpdate(selectors.errorBox, prevValue, 3000);
+            this.waitForErrorsToUpdate(prevValue, 3000);
         let allText;
         let allErrorsText = this.getTextOfElements(selectors.errorBox);
         for (let error of allErrorsText) {
-            allText += error + ' ';
+            allText += error;
         }
         logger.debug(`getAllErrors: got errors: ${allText}.`);
         return allText;

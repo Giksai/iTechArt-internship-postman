@@ -77,12 +77,15 @@ function userDoesNotExists(account) {
     registerPage.enterTextInBox(registerPage.boxTypes.login, account.login);
     registerPage.enterTextInBox(registerPage.boxTypes.password, account.password);
     registerPage.agreeToTermsOfUse();
+    let prevErrors = registerPage.getAllErrors();
     registerPage.submit();
 
-    let allErrors = registerPage.getAllErrors('');
+    let allErrors = registerPage.getAllErrors(prevErrors);
     if (allErrors.includes(errors.register_userAlreadyExists)
         || allErrors.includes(errors.register_emailAlreadyTaken)) {
-        throw new Error(`User already exists or email is already taken!`);
+            logger.debug(`Username or password already exists. Countinue to the next account.`);
+            cycleFlag = true;
+            return;
     }
     else {
         registered(account);
