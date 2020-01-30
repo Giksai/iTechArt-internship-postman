@@ -83,12 +83,12 @@ function userDoesNotExists(account) {
     let prevErrors = registerPage.getAllErrors();
     registerPage.submit();
 
-    let allErrors = registerPage.getAllErrors(prevErrors);
+    let allErrors = registerPage.getAllErrors(prevErrors, 1000);
     if (allErrors.includes(errors.register_userAlreadyExists)
         || allErrors.includes(errors.register_emailAlreadyTaken)) {
-            logger.debug(`Username or password already exists. Countinue to the next account.`);
-            cycleFlag = true;
-            return;
+        logger.debug(`Username or password already exists. Countinue to the next account.`);
+        cycleFlag = true;
+        return;
     }
     else {
         registered(account);

@@ -68,9 +68,11 @@ class BasePage {
     }
 
     waitForErrorsToUpdate(prevValue, updateTime = 10000, frequency = 500) {
-        browser.waitUntil(() => {
-            return this.getAllErrors() !== prevValue
-        }, updateTime, `errors must update.`, frequency);
+        try {
+            browser.waitUntil(() => {
+                return this.getAllErrors() !== prevValue
+            }, updateTime, `errors must update.`, frequency);
+        } catch { }
     }
 
     waitForElementToUpdate(element, prevValue, updateTime = 10000, frequency = 500) {
@@ -79,16 +81,17 @@ class BasePage {
         }, updateTime, `element ${element} must update`, frequency);
     }
 
-    getAllErrors(prevValue = null) {
+    getAllErrors(prevValue = null, updateTime = 5000) {
         logger.debug(`getAllErrors: trying to get all errors from current page.`);
         if (prevValue)
-            this.waitForErrorsToUpdate(prevValue, 3000);
+            this.waitForErrorsToUpdate(prevValue, 3000, updateTime);
         let allText;
         let allErrorsText = this.getTextOfElements(selectors.errorBox);
         for (let error of allErrorsText) {
             allText += error;
         }
         logger.debug(`getAllErrors: got errors: ${allText}.`);
+        if(!allText) return '';
         return allText;
     }
 
