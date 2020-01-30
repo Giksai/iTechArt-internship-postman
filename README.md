@@ -19,7 +19,7 @@ Test postman's authorization section by logging in with existing accounts and cr
 2 (registering) enter account details into corresponding fields and submit:
   2.1 if registered, continue through tutorial and log out while checking for message with confirmation link in background. When message arrives, append account and link and continue to the next account.
   2.2 if error occured, check it:
-    2.2.1: if email or username are already taken, throw an exception.
+    2.2.1: if email or username are already taken, continue to the next account.
 ## To launch:
 First, run 'npm i' in project's folder to install all necessary node packages, then run 'npm test'.
 Upon running 'npm test' command, start.js file is executed, which automatically starts webdriverIO with current config (wdio.conf.js).
