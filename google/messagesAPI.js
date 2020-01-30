@@ -1,6 +1,4 @@
-const fs = require('fs');
 const { google } = require('googleapis');
-const readline = require('readline');
 const log4js = require('../loggerConfig/loggerConfigurator');
 const base64url = require('base64url');
 const BaseApi = require('./baseAPI');
@@ -93,29 +91,6 @@ class MessagesAPI extends BaseApi {
 
         return foundSubject;
     }
-
-    /**
-     * Gets deadline from the message with given id and returns it
-     * @param {Number} messageId id of a message to get subject from
-     */
-    //     getMessageDeadline(messageId) {
-    //     logger.debug(`getMessageDeadline: Preparing to get deadline of message ${messageId}`);
-
-    //     //Getting message body without logging function's result
-    //     const body = await getMessageBody(messageId);
-    //     logger.debug("getMessageDeadline: Received message body");
-
-    //     if(!body.includes(this.tokenPath.deadlineName)) {
-    //         logger.error("Given message does not contain deadline info!");
-    //         return "";
-    //     }
-    //     let deadline = body.substring(body.indexOf(this.tokenPath.deadlineName));
-    //     deadline = deadline.substring(0, deadline.indexOf(tokenPath.deadlineEndName))
-    //     .replace(tokenPath.deadlineName, "");
-    //     logger.debug(`getMessageDeadline: Done getting deadline (${deadline})`)
-
-    //     return deadline;
-    // }
 
     /**
      * Goes through all message's headers and finds subject info

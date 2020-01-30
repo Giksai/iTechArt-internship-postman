@@ -7,11 +7,11 @@ const errors = {
 
 const registerDetails = {
     email: `FakeUser1389@gmail.com`,
-}
+};
 
 const messageData = {
     title: `Please validate your account`
-}
+};
 
 module.exports = {
     errors: errors,

@@ -14,12 +14,6 @@ class BasePage {
         browser.url(uri);
     }
 
-    setAttributeOfElement(xpath, attribute, value) {
-        let script =
-            `document.evaluate('${xpath}', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.setAttribute("${attribute}", "${value}");`;
-        browser.executeScript(script, []);
-    }
-
     getTextOfElements(selector, textConversionMethod) {
         logger.debug(`getTextOfElements: Trying to get text of elements with selector: (${selector}), 
         using converter function: (${textConversionMethod ? 'true' : 'false'}).`);
@@ -41,11 +35,6 @@ class BasePage {
     enterText(selector, text) {
         logger.debug(`enterText: trying to enter text: ${text} in a form: ${selector}.`);
         $(selector).setValue(text);
-    }
-
-    clearText(selector) {
-        logger.debug(`clearText: clearing text of element: ${selector}.`);
-        $(selector).clearValue();
     }
 
     waitForElement(selector, waitingTime = 20000) {

@@ -1,7 +1,4 @@
-const log4js = require('../loggerConfig/loggerConfigurator'),
-    BasePage = require('./basePage');
-
-const logger = log4js.getLogger('default');
+const BasePage = require('./basePage');
 
 const selectors = {
     box: (type) => `//form[@id="sign-up-form"]/div/input[@id="${type}"]`,
@@ -28,7 +25,6 @@ class RegisterPage extends BasePage {
     submit() {
         super.clickOnElement(selectors.submit);
     }
-
 };
 
 module.exports = new RegisterPage();

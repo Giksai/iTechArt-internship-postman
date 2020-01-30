@@ -1,7 +1,4 @@
-const log4js = require('../loggerConfig/loggerConfigurator'),
-    BasePage = require('./basePage');
-
-const logger = log4js.getLogger('default');
+const BasePage = require('./basePage');
 
 const selectors = {
     enterNameBox: `//input[@placeholder="Enter your name"]`,
