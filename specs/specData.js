@@ -6,7 +6,7 @@ const errors = {
 };
 
 const registerDetails = {
-    email: `FakeUser1389@gmail.com`,
+    email: `Fake.User.1389+internshipTask@gmail.com`,
 };
 
 const messageData = {
