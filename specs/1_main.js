@@ -41,7 +41,7 @@ function checkAccount(account) {
     loginPage.logIn(account.login, account.password);
     //Checks if account can log in by catching the page deloading
     if (profilePage.waitForElementToDisappear(loginPage.selectors.errorBox, 2000, 100)) {
-        loggedIn();
+        loggedIn(account);
     }
     else {
         errorOccured(account);
