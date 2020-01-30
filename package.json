@@ -37,6 +37,7 @@
   "dependencies": {
     "allure": "0.0.0",
     "allure-commandline": "^2.13.0",
+    "base64url": "^3.0.1",
     "geckodriver": "^1.19.1",
     "googleapis": "^39.2.0",
     "jasmine-allure-reporter": "^1.0.2",

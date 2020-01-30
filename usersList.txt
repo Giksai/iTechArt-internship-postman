@@ -1,3 +1,5 @@
-user1213242342/password;
-admin/password;
-userThatDoesNotExist/anotherPassword
+Giksai/cfelc123;
+Giksai/cfelc123;
+FakeName123123/FakePassword;
+Giksai/cfelc123;
+FakeName123123/FakePassword

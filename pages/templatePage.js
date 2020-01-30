@@ -1,5 +1,5 @@
 const log4js = require('../loggerConfig/loggerConfigurator'),
-    {BasePage} = require('./basePage');
+    BasePage = require('./basePage');
 
 const logger = log4js.getLogger('default');
 

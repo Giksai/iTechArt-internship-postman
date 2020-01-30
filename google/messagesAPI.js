@@ -1,52 +1,35 @@
-const fs = require('fs'),
-    {google} = require('googleapis'),
-    readline = require('readline'),
-    log4js = require('./loggerConfig/loggerConfigurator'),
-    base64url = require('base64url');
+const fs = require('fs');
+const {google} = require('googleapis');
+const readline = require('readline');
+const log4js = require('../loggerConfig/loggerConfigurator');
+const base64url = require('base64url');
+const BaseApi = require('./baseAPI');
 
 const logger = log4js.getLogger('default');
-const tokenPath = 'token.json'
 
-class MessagesAPI {
-
-    authenticate() {
-    const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
-    const {client_secret, client_id, redirect_uris} = credentials.installed;
-    const authentication = new google.auth.OAuth2(
-        client_id, client_secret, redirect_uris[0]);
-  
-    // Check if we have previously stored a token.
-    const token = fs.readFileSync(tokenPath, 'utf8');
-      
-    if(!token) throw new Error("Token file has not been found");
-    authentication.setCredentials(JSON.parse(token));
-  
-    return authentication;
-}
+class MessagesAPI extends BaseApi {
 
 /**
  * Returns an array of ids of user's messages
  */
-    getAllMessages() {
+    async getAllMessages() {
     logger.debug("getAllMessages: Preparing to get all messages");
 
-    const auth = authenticate();
+    const auth = this.authenticate();
     const gmail = google.gmail({version: 'v1', auth});
-    logger.debug("getAllMessages: Got gmail object");
 
     const res = await gmail.users.messages.list({
       userId: "me"
     });
-    logger.debug("getAllMessages: Performed list request");
 
     if(!res) throw new Error("getAllMessages: The API has returned an error");
-    logger.debug("getAllMessages: Done getting all messages");
+    logger.debug(`getAllMessages: Done getting all messages: ${res.data.messages}`);
 
     return res.data.messages;
 }
 
     getMessagesAmount() {
-    const amount = (await getAllMessages()).length;
+    const amount = (await this.getAllMessages()).length;
     logger.debug(`getMessagesAmount: Got amount of all messages (${amount})`);
 
     return amount;
@@ -57,20 +40,18 @@ class MessagesAPI {
  * and returns full result
  * @param {Number} messageId Id of the message to search for
  */
-    getMessage(messageId) {
+    async getMessage(messageId) {
     logger.debug(`getMessage: Preparing to get message ${messageId}`);
-    const auth = authenticate();
+    const auth = this.authenticate();
     const gmail = google.gmail({version: 'v1', auth});
-    logger.debug("getMessage: Got gmail object");
 
     const res = await gmail.users.messages.get({
       userId: "me",
       id: messageId
     });
-    logger.debug("getMessage: Performed get request");
 
     if(!res) throw new Error("getMessage: The API has returned an error");
-    logger.debug("getMessage: Done getting message");
+    logger.debug(`getMessage: Done getting message: ${res}`);
 
     return res;
 }
@@ -79,15 +60,19 @@ class MessagesAPI {
  * Gets body of the message with given id and returns it
  * @param {Number} messageId id of a message to get body from
  */
-    getMessageBody(messageId) {
+    async getMessageBody(messageId) {
     logger.debug(`getMessageBody: Preparing to get body of message ${messageId}`);
 
-    const res = await getMessage(messageId);
+    const res = await this.getMessage(messageId);
     let body;
-    if(res.data.payload.body.size === 0)
-        body = base64url.decode(res.data.payload.parts[0].body.data);
-    else
-        body = res.data.snippet;
+    
+    //body = JSON.stringify(res);
+    body = base64url.decode(res.data.payload.body.data);
+
+    // if(res.data.payload.body.size === 0)
+    //     body = base64url.decode(res.data.payload.parts[0].body.data);
+    // else
+    //     body = res.data.snippet;
     logger.debug(`getMessageBody: Done getting message body`);
 
     return body;
@@ -97,40 +82,40 @@ class MessagesAPI {
  * Gets subject of the message with given id and returns it
  * @param {Number} messageId id of a message to get subject from
  */
-    getMessageSubject(messageId) {
+    async getMessageSubject(messageId) {
     logger.debug(`getMessageSubject: Preparing to get subject of message ${messageId}`);
 
-    const res = await getMessage(messageId);
+    const res = await this.getMessage(messageId);
     logger.debug("getMessageSubject: Got message snippet");
 
-    let foundSubject = getSubjectFromHeaders(res.data.payload.headers);
+    let foundSubject = this.getSubjectFromHeaders(res.data.payload.headers);
     logger.debug(`getMessageSubject: Done getting message's subject (${foundSubject})`);
 
-    return foundSubject
+    return foundSubject;
 }
 
 /**
  * Gets deadline from the message with given id and returns it
  * @param {Number} messageId id of a message to get subject from
  */
-    getMessageDeadline(messageId) {
-    logger.debug(`getMessageDeadline: Preparing to get deadline of message ${messageId}`);
+//     getMessageDeadline(messageId) {
+//     logger.debug(`getMessageDeadline: Preparing to get deadline of message ${messageId}`);
 
-    //Getting message body without logging function's result
-    const body = await getMessageBody(messageId);
-    logger.debug("getMessageDeadline: Received message body");
+//     //Getting message body without logging function's result
+//     const body = await getMessageBody(messageId);
+//     logger.debug("getMessageDeadline: Received message body");
 
-    if(!body.includes(tokenPath.deadlineName)) {
-        logger.error("Given message does not contain deadline info!");
-        return "";
-    }
-    let deadline = body.substring(body.indexOf(tokenPath.deadlineName));
-    deadline = deadline.substring(0, deadline.indexOf(tokenPath.deadlineEndName))
-    .replace(tokenPath.deadlineName, "");
-    logger.debug(`getMessageDeadline: Done getting deadline (${deadline})`)
+//     if(!body.includes(this.tokenPath.deadlineName)) {
+//         logger.error("Given message does not contain deadline info!");
+//         return "";
+//     }
+//     let deadline = body.substring(body.indexOf(this.tokenPath.deadlineName));
+//     deadline = deadline.substring(0, deadline.indexOf(tokenPath.deadlineEndName))
+//     .replace(tokenPath.deadlineName, "");
+//     logger.debug(`getMessageDeadline: Done getting deadline (${deadline})`)
 
-    return deadline;
-}
+//     return deadline;
+// }
 
 /**
  * Goes through all message's headers and finds subject info

@@ -146,7 +146,7 @@ exports.config = {
     // Options to be passed to Mocha.
     // See the full list at http://mochajs.org/
     jasmineNodeOpts: {
-        defaultTimeoutInterval: 20000,
+        defaultTimeoutInterval: 500000000,
     },
     //
     // =====

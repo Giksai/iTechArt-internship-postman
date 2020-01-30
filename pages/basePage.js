@@ -54,22 +54,46 @@ class BasePage {
         elementToWaitFor.waitForDisplayed(waitingTime);
     }
 
-    waitForErrorsToUpdate(prevValue, updateTime = 10000) {
-        browser.waitUntil(() => {
-            return this.getAllErrors() !== prevValue
-          }, updateTime, `errors must update.`);
+    //Does not throw an error
+    waitForElementToAppear(selector, waitingTime = 5000, frequency = 100) {
+        let time = 0;
+        while(time < waitingTime) {
+            if($(selector).isExisting())
+                return true;
+            time += frequency;
+            browser.pause(frequency);
+        }
+        return false;
     }
 
-    waitForElementToUpdate(element, prevValue, updateTime = 20000) {
+    //Does not throw an error
+    waitForElementToDisappear(selector, waitingTime = 5000, frequency = 100) {
+        let time = 0;
+        while(time < waitingTime) {
+            if(!$(selector).isExisting())
+                return true;
+            time += frequency;
+            browser.pause(frequency);
+        }
+        return false;
+    }
+
+    waitForErrorsToUpdate(prevValue, updateTime = 10000, frequency = 500) {
+        browser.waitUntil(() => {
+            return this.getAllErrors() !== prevValue
+          }, updateTime, `errors must update.`, frequency);
+    }
+
+    waitForElementToUpdate(element, prevValue, updateTime = 10000, frequency = 500) {
         browser.waitUntil(() => {
             return $(element).getText() !== prevValue
-          }, updateTime, `element ${element} must update`);
+          }, updateTime, `element ${element} must update`, frequency);
     }
 
     getAllErrors(prevValue = null) {
         logger.debug(`getAllErrors: trying to get all errors from current page.`);
         if(prevValue)
-            this.waitForElementToUpdate(selectors.errorBox, prevValue);
+            this.waitForElementToUpdate(selectors.errorBox, prevValue, 3000);
         let allText;
         let allErrorsText = this.getTextOfElements(selectors.errorBox);
         for(let error of allErrorsText) {

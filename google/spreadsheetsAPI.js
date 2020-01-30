@@ -1,49 +1,61 @@
-const fs = require('fs'),
-    {google} = require('googleapis'),
-    readline = require('readline'),
-    log4js = require('./loggerConfig/loggerConfigurator'),
-    base64url = require('base64url');
+const fs = require('fs');
+const {google} = require('googleapis');
+const readline = require('readline');
+const log4js = require('../loggerConfig/loggerConfigurator');
+const base64url = require('base64url');
+const BaseApi = require('./baseAPI');
 
 const logger = log4js.getLogger('default');
-const tokenPath = 'token.json'
 
-class SpreadsheetsAPI {
+class SpreadsheetsAPI extends BaseApi {
 
-    authenticate() {
-    const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
-    const {client_secret, client_id, redirect_uris} = credentials.installed;
-    const authentication = new google.auth.OAuth2(
-        client_id, client_secret, redirect_uris[0]);
-  
-    // Check if we have previously stored a token.
-    const token = fs.readFileSync(tokenPath, 'utf8');
-      
-    if(!token) throw new Error("Token file has not been found");
-    authentication.setCredentials(JSON.parse(token));
-  
-    return authentication;
-}
+    async appendAccount(account, confirmLink) {
+        logger.debug(
+            `Trying to insert account with 
+            login: ${account.login}
+            password: ${account.password}
+            ${confirmLink ? `${confirmLink} confirm link` : `without confirmation link`}.`);
 
-    listMajors(auth) {
-    const sheets = google.sheets({version: 'v4', auth});
-    sheets.spreadsheets.values.get({
-      spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
-      range: 'Class Data!A2:E',
-    }, (err, res) => {
-      if (err) return console.log('The API returned an error: ' + err);
-      const rows = res.data.values;
-      if (rows.length) {
-        console.log('Name, Major:');
-        // Print columns A and E, which correspond to indices 0 and 4.
-        rows.map((row) => {
-          console.log(`${row[0]}, ${row[4]}`);
-        });
-      } else {
-        console.log('No data found.');
-      }
-    });
-  }
+        const auth = this.authenticate();
+        const sheets = google.sheets({version: 'v4', auth});
+        return await sheets.spreadsheets.values.append({
+            "spreadsheetId": "1n0VKittiGKJg1wpggBoI_L1zetqp8asfXmWmK530oDY",
+            "range": "A2:C2",
+            "includeValuesInResponse": true,
+            "valueInputOption": "RAW",
+            "resource": {
+              "majorDimension": "ROWS",
+              "range": "A2:C2",
+              "values": [
+                [
+                  account.login,
+                  account.password,
+                  confirmLink ? confirmLink : 'Пользователь уже зарегистрирован' 
+                ]
+              ]
+            }
+          });
+    }
 
+//     listMajors(auth) {
+//     const sheets = google.sheets({version: 'v4', auth});
+//     sheets.spreadsheets.values.get({
+//       spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
+//       range: 'Class Data!A2:E',
+//     }, (err, res) => {
+//       if (err) return console.log('The API returned an error: ' + err);
+//       const rows = res.data.values;
+//       if (rows.length) {
+//         console.log('Name, Major:');
+//         // Print columns A and E, which correspond to indices 0 and 4.
+//         rows.map((row) => {
+//           console.log(`${row[0]}, ${row[4]}`);
+//         });
+//       } else {
+//         console.log('No data found.');
+//       }
+//     });
+//   }
 };
 
 module.exports = new SpreadsheetsAPI();

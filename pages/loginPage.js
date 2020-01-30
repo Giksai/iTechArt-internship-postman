@@ -6,6 +6,7 @@ const logger = log4js.getLogger('default');
 const selectors = {
     signInBtn: `//button[@type="submit"]`,
     errorBox: `//span[@id="notification-message"]`,
+    createAccountBtn: `//a[@id="sign-up-link"]`,
 };
 
 class LoginPage extends BasePage {
@@ -15,6 +16,7 @@ class LoginPage extends BasePage {
         login: `//input[@id="username"]`,
         password: `//input[@id="password"]`,
     }
+
 };
 
 module.exports = new LoginPage();
