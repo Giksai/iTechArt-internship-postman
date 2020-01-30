@@ -39,11 +39,11 @@ describe(`Postman authentication check.`,() => {
     });
   });
 
-function checkErrors(account) {
+async function checkErrors(account) {
     let allErrors = loginPage.getAllErrors();
     if(allErrors.includes(errors.auth_wrongData)) {
         logger.trace('User does not exist.');
-        userDoesNotExist(account);
+        await userDoesNotExist(account);
     }
     else if(allErrors.includes(errors.auth_timeout)) {
         logger.trace(`Exceeded maximum tries.`);
@@ -65,14 +65,14 @@ function checkErrors(account) {
         return;
     }
     else {
-        waitForMessage(account, await messagesAPI.getMessagesAmount());
+        await waitForMessage(account, await messagesAPI.getMessagesAmount());
     }
   }
 
     async function waitForMessage(account, prevMsgAmount) {
         logger.trace(`Waiting for message.`);
         while(prevMsgAmount === await messagesAPI.getMessagesAmount()) {
-            await browser.pause(20000);
+            browser.pause(20000);
         }
         logger.trace(`Got message.`);
         for(let messageId of await messagesAPI.getAllMessages()) {
