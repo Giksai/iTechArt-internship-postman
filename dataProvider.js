@@ -9,7 +9,7 @@ class DataProvider {
     constructor() {
         logger.debug(`Trying to get all accounts from file ${filePath}.`);
         let plainText = fs.readFileSync(filePath, 'utf8');
-        for(let account of plainText.split(';')) {
+        for (let account of plainText.split(';')) {
             account = account.replace('\n', '').replace('\r', '');
             accounts.push({
                 login: account.split('/')[0],
@@ -18,7 +18,7 @@ class DataProvider {
         }
 
         logger.debug(`All account/password pairs: `);
-        for(let account of accounts) {
+        for (let account of accounts) {
             logger.debug(`|${account.login}|${account.password}|`);
         }
     }
@@ -28,12 +28,12 @@ class DataProvider {
     }
 
     getNextLoginDetails(prevDetails = null) {
-        logger.debug(`getNextLoginDetails: getting account ${prevDetails ? `with previous details: ${prevDetails}` : `for the first time` }.`);
-        if(!prevDetails) {
+        logger.debug(`getNextLoginDetails: getting account ${prevDetails ? `with previous details: ${prevDetails}` : `for the first time`}.`);
+        if (!prevDetails) {
             return accounts[0];
         }
         else {
-            accounts[accounts.indexOf(prevDetails)+1];
+            accounts[accounts.indexOf(prevDetails) + 1];
         }
     }
 };

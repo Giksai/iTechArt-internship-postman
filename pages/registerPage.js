@@ -20,11 +20,11 @@ class RegisterPage extends BasePage {
     enterTextInBox(type, text) {
         super.enterText(selectors.box(type), text);
     }
-    
+
     agreeToTermsOfUse() {
         super.clickOnElement(selectors.termsOfUseCheckbox);
     }
-    
+
     submit() {
         super.clickOnElement(selectors.submit);
     }

@@ -15,7 +15,7 @@ class BasePage {
     }
 
     setAttributeOfElement(xpath, attribute, value) {
-        let script = 
+        let script =
             `document.evaluate('${xpath}', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.setAttribute("${attribute}", "${value}");`;
         browser.executeScript(script, []);
     }
@@ -26,13 +26,13 @@ class BasePage {
         let foundElements = [];
         let allElements = $$(selector);
         logger.debug(`getTextOfElements: Amount of found elements: ${allElements.length}`);
-            for(let elem of allElements) {
-                    if(textConversionMethod) {
-                        foundElements.push(textConversionMethod(elem.getText()));
-                    } else {
-                        foundElements.push(elem.getText());
-                    }
+        for (let elem of allElements) {
+            if (textConversionMethod) {
+                foundElements.push(textConversionMethod(elem.getText()));
+            } else {
+                foundElements.push(elem.getText());
             }
+        }
 
         logger.debug(`getTextOfElements: Found elements's texts: (${foundElements}).`);
         return foundElements;
@@ -57,8 +57,8 @@ class BasePage {
     //Does not throw an error
     waitForElementToAppear(selector, waitingTime = 5000, frequency = 100) {
         let time = 0;
-        while(time < waitingTime) {
-            if($(selector).isExisting())
+        while (time < waitingTime) {
+            if ($(selector).isExisting())
                 return true;
             time += frequency;
             browser.pause(frequency);
@@ -69,8 +69,8 @@ class BasePage {
     //Does not throw an error
     waitForElementToDisappear(selector, waitingTime = 5000, frequency = 100) {
         let time = 0;
-        while(time < waitingTime) {
-            if(!$(selector).isExisting())
+        while (time < waitingTime) {
+            if (!$(selector).isExisting())
                 return true;
             time += frequency;
             browser.pause(frequency);
@@ -81,22 +81,22 @@ class BasePage {
     waitForErrorsToUpdate(prevValue, updateTime = 10000, frequency = 500) {
         browser.waitUntil(() => {
             return this.getAllErrors() !== prevValue
-          }, updateTime, `errors must update.`, frequency);
+        }, updateTime, `errors must update.`, frequency);
     }
 
     waitForElementToUpdate(element, prevValue, updateTime = 10000, frequency = 500) {
         browser.waitUntil(() => {
             return $(element).getText() !== prevValue
-          }, updateTime, `element ${element} must update`, frequency);
+        }, updateTime, `element ${element} must update`, frequency);
     }
 
     getAllErrors(prevValue = null) {
         logger.debug(`getAllErrors: trying to get all errors from current page.`);
-        if(prevValue)
+        if (prevValue)
             this.waitForElementToUpdate(selectors.errorBox, prevValue, 3000);
         let allText;
         let allErrorsText = this.getTextOfElements(selectors.errorBox);
-        for(let error of allErrorsText) {
+        for (let error of allErrorsText) {
             allText += error + ' ';
         }
         logger.debug(`getAllErrors: got errors: ${allText}.`);

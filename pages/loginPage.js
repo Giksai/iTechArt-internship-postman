@@ -11,10 +11,15 @@ const selectors = {
 
 class LoginPage extends BasePage {
     selectors = selectors
-
     authTypes = {
         login: `//input[@id="username"]`,
         password: `//input[@id="password"]`,
+    }
+
+    logIn(username, password) {
+        super.enterText(this.authTypes.login, username);
+        super.enterText(this.authTypes.password, password);
+        super.clickOnElement(this.selectors.signInBtn);
     }
 
 };

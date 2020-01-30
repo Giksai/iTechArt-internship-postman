@@ -4,7 +4,7 @@ const log4js = require('../loggerConfig/loggerConfigurator'),
 const logger = log4js.getLogger('default');
 
 const selectors = {
-    profileIcon: `//div[@class="pm-user-icon pm-user-icon-color-0 pm-user-icon-sm pm-icon-circle"]`,
+    profileIcon: `//div/div/button[@class="user-dropdown__button"]`,
     signOutBtn: `//button[text()="Sign Out"]`,
     confirmSignOutBtn: `//button[@id="sign-out-btn"]`,
 };
