@@ -19,7 +19,10 @@ describe(`Postman authentication check.`, () => {
     beforeAll(() => {
         mainPage.open();
         mainPage.clickOnElement(mainPage.selectors.login);
-    })
+    });
+    afterAll(() => {
+        logger.trace(`Sheet link: https://docs.google.com/spreadsheets/d/1n0VKittiGKJg1wpggBoI_L1zetqp8asfXmWmK530oDY/edit?usp=sharing`);
+    });
 
     using(accountData, function (account) {
         it(` checking account: username: ${account.login}, password: ${account.password} (1).`,
