@@ -12,6 +12,9 @@ const dataReader = require('../utils/dataReader');
 const using = require('jasmine-data-provider');
 
 const logger = log4js.getLogger('default');
+const messageData = {
+    title: `Please validate your account`
+};
 
 describe(`Postman authentication check.`, () => {
     beforeAll(() => {
@@ -97,7 +100,7 @@ function registered(account) {
     logger.trace(`Registered successfully.`);
     //Used to wait for an async function to end
     let awaitToken = { completed: false };
-    messagesAPI.waitForMessage(account, awaitToken); //asynchronously waits and checks new letters
+    messagesAPI.waitForMessage(account, awaitToken, correctEmailCheck); //asynchronously waits and checks new letters
     welcomePage.enterName(account.email);
     welcomePage.submit();
     welcomePage.maybeLater();
@@ -105,4 +108,14 @@ function registered(account) {
     while (awaitToken.completed != true) {
         browser.pause(500);
     }
+}
+
+async function correctEmailCheck(messageId, account) {
+    if (await messagesAPI.getMessageSubject(messageId.id) === messageData.title) {
+        if (messagesAPI.getRegisteredEmail((await messagesAPI.getMessage(messageId.id)))
+            === account.email.toLowerCase()) {
+            return true;
+        }
+    }
+    return false;
 }

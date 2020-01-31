@@ -5,9 +5,6 @@ const BaseApi = require('./baseAPI');
 const spreadsheetsAPI = require('./spreadsheetsAPI');
 
 const logger = log4js.getLogger('default');
-const messageData = {
-    title: `Please validate your account`
-};
 
 class MessagesAPI extends BaseApi {
 
@@ -99,25 +96,24 @@ class MessagesAPI extends BaseApi {
         }
     }
 
-    async waitForMessage(account, awaitToken) {
+    async waitForMessage(account, awaitToken, predicate) {
         logger.trace(`Waiting for the message with email: ${account.email}`);
         while (awaitToken.completed !== true) {
             for (let messageId of await this.getAllMessages()) {
-                if (await this.getMessageSubject(messageId.id) === messageData.title) {
-                    if (this.getRegisteredEmail((await this.getMessage(messageId.id)))
-                        === account.email.toLowerCase()) {
-                        logger.trace(`Got correct message, appending account.`);
-                        let link = this.getConfirmLink(await this.getMessageBody(messageId.id));
-                        await spreadsheetsAPI.appendAccount(account, link);
-                        awaitToken.completed = true;
-                        break;
-                    }
+                if (await predicate(messageId, account) === true) {
+                    logger.trace(`Got correct message, appending account.`);
+                    let link = this.getConfirmLink(await this.getMessageBody(messageId.id));
+                    await spreadsheetsAPI.appendAccount(account, link);
+                    awaitToken.completed = true;
+                    break;
                 }
                 browser.pause(3000);
             }
             browser.pause(10000);
         }
     }
+
+
 
     getConfirmLink(messageBody) {
         let link = messageBody.match(/go.postman.co\/validate-email\?token=[0-9a-zA-Z]+/)[0];
