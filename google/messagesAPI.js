@@ -113,8 +113,6 @@ class MessagesAPI extends BaseApi {
         }
     }
 
-
-
     getConfirmLink(messageBody) {
         let link = messageBody.match(/go.postman.co\/validate-email\?token=[0-9a-zA-Z]+/)[0];
         logger.trace(`Got confirmation link: ${link}.`);
