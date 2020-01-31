@@ -5,7 +5,7 @@ class BaseAPI {
     tokenPath = './google/token.json'
 
     authenticate() {
-        const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
+        const credentials = JSON.parse(fs.readFileSync('./google/credentials.json', 'utf8'));
         const { client_secret, client_id, redirect_uris } = credentials.installed;
         const authentication = new google.auth.OAuth2(
             client_id, client_secret, redirect_uris[0]);

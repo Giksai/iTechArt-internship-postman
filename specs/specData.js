@@ -5,16 +5,6 @@ const errors = {
     register_emailAlreadyTaken: `An account with this email already exists.`,
 };
 
-const registerDetails = {
-    email: `Fake.User.1389+internshipTask@gmail.com`,
-};
-
-const messageData = {
-    title: `Please validate your account`
-};
-
 module.exports = {
     errors: errors,
-    registerDetails: registerDetails,
-    messageData: messageData,
 };

@@ -9,7 +9,7 @@ Test postman's authorization section by logging in with existing accounts and cr
 * .gitignore file contain files excluded from git repository. </br> 
 * Package.json specify project's info, like included packages, version, git path, name and launch scripts. </br>
 * WebdriverIO configuration is stored in wdio.conf.js file in project's root folder. </br>
-* Accounts are stored in accountData.js file in project's root.
+* Accounts are stored in accounts.txt file in project's root.
 ## Algorithm
 1 (logging in) try to log in with given account:</br>
   1.1 if logged in, add current account to the spreadsheet, log out and continue to the next account.</br>

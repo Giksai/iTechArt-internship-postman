@@ -2,8 +2,12 @@ const { google } = require('googleapis');
 const log4js = require('../loggerConfig/loggerConfigurator');
 const base64url = require('base64url');
 const BaseApi = require('./baseAPI');
+const spreadsheetsAPI = require('./spreadsheetsAPI');
 
 const logger = log4js.getLogger('default');
+const messageData = {
+    title: `Please validate your account`
+};
 
 class MessagesAPI extends BaseApi {
 
@@ -78,8 +82,6 @@ class MessagesAPI extends BaseApi {
         logger.debug(`getMessageSubject: Preparing to get subject of message ${messageId}`);
 
         const res = await this.getMessage(messageId);
-        logger.debug("getMessageSubject: Got message snippet");
-
         let foundSubject = this.getSubjectFromHeaders(res.data.payload.headers);
         logger.debug(`getMessageSubject: Done getting message's subject (${foundSubject})`);
 
@@ -94,6 +96,41 @@ class MessagesAPI extends BaseApi {
         for (let obj of headers) {
             if (obj.name === "Subject")
                 return obj.value;
+        }
+    }
+
+    async waitForMessage(account, awaitToken) {
+        logger.trace(`Waiting for the message with email: ${account.email}`);
+        while (awaitToken.completed !== true) {
+            for (let messageId of await this.getAllMessages()) {
+                if (await this.getMessageSubject(messageId.id) === messageData.title) {
+                    if (this.getRegisteredEmail((await this.getMessage(messageId.id)))
+                        === account.email.toLowerCase()) {
+                        logger.trace(`Got correct message, appending account.`);
+                        let link = this.getConfirmLink(await this.getMessageBody(messageId.id));
+                        await spreadsheetsAPI.appendAccount(account, link);
+                        awaitToken.completed = true;
+                        break;
+                    }
+                }
+                browser.pause(3000);
+            }
+            browser.pause(10000);
+        }
+    }
+
+    getConfirmLink(messageBody) {
+        let link = messageBody.match(/go.postman.co\/validate-email\?token=[0-9a-zA-Z]+/)[0];
+        logger.trace(`Got confirmation link: ${link}.`);
+        return link;
+    }
+
+    getRegisteredEmail(mail) {
+        for (let header of mail.data.payload.headers) {
+            if (header.name == 'Delivered-To') {
+                logger.debug(`Got email: ${header.value}.`);
+                return header.value;
+            }
         }
     }
 };

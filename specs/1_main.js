@@ -1,4 +1,4 @@
-const { errors, registerDetails, messageData } = require('./specData');
+const { errors } = require('./specData');
 const mainPage = require('../pages/mainPage');
 const profilePage = require('../pages/profilePage');
 const loginPage = require('../pages/loginPage');
@@ -7,13 +7,11 @@ const messagesAPI = require('../google/messagesAPI');
 const spreadsheetsAPI = require('../google/spreadsheetsAPI');
 const registerPage = require('../pages/registerPage');
 const welcomePage = require('../pages/welcomePage');
-const accountData = require('../accountData');
+const strGenerator = require('../utils/stringGenerator');
+const dataReader = require('../utils/dataReader');
 const using = require('jasmine-data-provider');
 
 const logger = log4js.getLogger('default');
-
-//Used to wait for an async function to end
-let cycleFlag = false;
 
 describe(`Postman authentication check.`, () => {
     beforeAll(() => {
@@ -24,15 +22,10 @@ describe(`Postman authentication check.`, () => {
         logger.trace(`Sheet link: https://docs.google.com/spreadsheets/d/1n0VKittiGKJg1wpggBoI_L1zetqp8asfXmWmK530oDY/edit?usp=sharing`);
     });
 
-    using(accountData, function (account) {
-        it(` checking account: username: ${account.login}, password: ${account.password} (1).`,
+    using(dataReader.getAllAccounts(), function (account) {
+        it(` checking account: email: ${account.email}, password: ${account.password} (1).`,
             () => {
                 checkAccount(account);
-                //Waits for an async function to end
-                while (!cycleFlag) {
-                    browser.pause(500);
-                }
-                cycleFlag = false;
             });
     });
 });
@@ -40,8 +33,8 @@ describe(`Postman authentication check.`, () => {
 //Main account checking function
 function checkAccount(account) {
     logger.trace(
-        `Trying to log in with username: ${account.login}, password: ${account.password}.`);
-    loginPage.logIn(account.login, account.password);
+        `Trying to log in with email: ${account.email}, password: ${account.password}.`);
+    loginPage.logIn(account.email, account.password);
     //Checks if account can log in by catching the page deloading
     if (profilePage.waitForElementToDisappear(loginPage.selectors.errorBox, 2000, 100)) {
         loggedIn(account);
@@ -58,7 +51,6 @@ function loggedIn(account) {
         logger.trace(`Logged in successfully, appending to the spreadsheet.`);
         spreadsheetsAPI.appendAccount(account);
         profilePage.logOut();
-        cycleFlag = true;
     }
 }
 
@@ -76,8 +68,8 @@ function userDoesNotExists(account) {
     logger.trace('User does not exist.');
     loginPage.clickOnElement(loginPage.selectors.createAccountBtn);
     browser.pause(1000);
-    registerPage.enterTextInBox(registerPage.boxTypes.email, registerDetails.email);
-    registerPage.enterTextInBox(registerPage.boxTypes.login, account.login);
+    registerPage.enterTextInBox(registerPage.boxTypes.email, account.email);
+    registerPage.enterTextInBox(registerPage.boxTypes.login, strGenerator.getRandomString());
     registerPage.enterTextInBox(registerPage.boxTypes.password, account.password);
     registerPage.agreeToTermsOfUse();
     let prevErrors = registerPage.getAllErrors();
@@ -87,7 +79,6 @@ function userDoesNotExists(account) {
     if (allErrors.includes(errors.register_userAlreadyExists)
         || allErrors.includes(errors.register_emailAlreadyTaken)) {
         logger.debug(`Username or password already exists. Countinue to the next account.`);
-        cycleFlag = true;
         return;
     }
     else {
@@ -104,34 +95,14 @@ function timeout(account) {
 
 function registered(account) {
     logger.trace(`Registered successfully.`);
-    waitForMessage(account); //asynchronously waits and checks new letters
-    welcomePage.enterName(account.login);
+    //Used to wait for an async function to end
+    let awaitToken = { completed: false };
+    messagesAPI.waitForMessage(account, awaitToken); //asynchronously waits and checks new letters
+    welcomePage.enterName(account.email);
     welcomePage.submit();
     welcomePage.maybeLater();
     profilePage.logOut();
-}
-
-async function waitForMessage(account) {
-    let prevMsgAmount = await messagesAPI.getMessagesAmount()
-    logger.trace(`Waiting for a new message.`);
-    while (prevMsgAmount === await messagesAPI.getMessagesAmount()) {
-        browser.pause(5000);
+    while (awaitToken.completed != true) {
+        browser.pause(500);
     }
-    logger.trace(`Got message.`);
-    for (let messageId of await messagesAPI.getAllMessages()) {
-        let title = await messagesAPI.getMessageSubject(messageId.id)
-        if (title === messageData.title) {
-            logger.trace(`Got correct message, appending account.`);
-            let link = getConfirmLink(await messagesAPI.getMessageBody(messageId.id));
-            await spreadsheetsAPI.appendAccount(account, link);
-            cycleFlag = true;
-            break;
-        }
-    }
-}
-
-function getConfirmLink(messageBody) {
-    let link = messageBody.match(/go.postman.co\/validate-email\?token=[0-9a-zA-Z]+/)[0];
-    logger.trace(`Got confirmation link: ${link}.`);
-    return link;
 }
