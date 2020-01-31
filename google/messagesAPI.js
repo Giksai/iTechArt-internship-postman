@@ -64,13 +64,7 @@ class MessagesAPI extends BaseApi {
         const res = await this.getMessage(messageId);
         let body;
 
-        //body = JSON.stringify(res);
         body = base64url.decode(res.data.payload.body.data);
-
-        // if(res.data.payload.body.size === 0)
-        //     body = base64url.decode(res.data.payload.parts[0].body.data);
-        // else
-        //     body = res.data.snippet;
         logger.debug(`getMessageBody: Done getting message body`);
 
         return body;
