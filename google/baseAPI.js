@@ -1,10 +1,5 @@
 const fs = require('fs');
 const { google } = require('googleapis');
-const readline = require('readline');
-const log4js = require('../loggerConfig/loggerConfigurator');
-const base64url = require('base64url');
-
-const logger = log4js.getLogger('default');
 
 class BaseAPI {
     tokenPath = './google/token.json'
