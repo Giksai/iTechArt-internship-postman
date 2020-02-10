@@ -105,7 +105,7 @@ function registered(account) {
     welcomePage.submit();
     welcomePage.maybeLater();
     profilePage.logOut();
-    while (awaitToken.completed != true) {
+    while (awaitToken.completed !== true) {
         browser.pause(500);
     }
 }
